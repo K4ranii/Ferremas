@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Sobre Nosotros - Ferremas</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/ala.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Poppins:300,400,500,700" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+  
+  <!-- Template Main CSS File -->
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+
+</head>
+<script>
+  function showLogoutMessage(event) {
+      event.preventDefault();
+      var message = "¡Has cerrado la sesión exitosamente!";
+      alert(message);
+      window.location.href = event.currentTarget.href;
+  }
+</script>
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top d-flex align-items-center header-transparent header-scrolled">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div id="logo">
+        <h1><a href="/">Ferremas</a></h1>
+      </div>
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link scrollto" href="/#hero">Inicio</a></li>
+          <li><a class="nav-link scrollto active" href="nosotros.html">Misión</a></li>
+          <li><a class="nav-link scrollto" href="galeria.html">Galería</a></li>
+          <li><a class="nav-link scrollto" href="/#contact">Ubicación</a></li> 
+          <li><a class="nav-link scrollto" href="mostrar.html">Productos</a></li>    
+          {% if user.is_authenticated %}
+          <li><a class="nav-link scrollto" href="administracion.html">Administración</a></li>     
+          {% endif %}  
+          {% if user.is_authenticated %}
+          <li><a class="nav-link scrollto" href="/admin/logout/" onclick="showLogoutMessage(event)">Cerrar Sesión</a></li>
+          {% else %}
+          <li><a class="nav-link scrollto" href="/admin/">Login</a></li>
+          {% endif %}
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+    </div>
+  </header><!-- End Header -->
+
+  <main id="main">
+   
+    <!-- ======= Breadcrumbs Section ======= -->
+
+    <section id="about" class="breadcrumbs">
+      <br>
+        <h1 id="nosotros" class="text-center">
+        <strong>Nuestra Misión</strong> 
+        </h1>
+        <br>
+        <div class="container aos-init aos-animate" data-aos="fade-up">
+          <div class="row about-container">           
+            <div class="col-lg-6 content order-lg-2 order-2">
+              <p>
+                &nbsp;&nbsp;
+                Somos "Ferremas", una cooperativa de artistas dedicados a diferentes expresiones artísticas como: 
+                Pintura, escultura, orfebrería, tejido, y más. Nuestro grupo está compuesto por artistas con 
+                distintas trayectorias y experiencias, pero con un objetivo en común: crear arte que transmita 
+                emociones y que deje una huella en quienes lo aprecien.
+              </p>
+              <p>
+                &nbsp;&nbsp;
+                Nos enfocamos en la exploración constante de nuevas técnicas y estilos para poder llevar nuestra 
+                creatividad al límite. Cada miembro de nuestro grupo aporta su propio enfoque y perspectiva, 
+                lo que se traduce en una amplia variedad de productos de arte.
+                En nuestro taller, ubicado en el corazón de la ciudad, creamos y trabajamos en equipo para llevar 
+                a cabo nuestros proyectos y exposiciones. Nos inspiramos en la belleza de la naturaleza, la sociedad 
+                y el mundo que nos rodea para crear productos que reflejen nuestra visión del mundo.
+              </p>
+              <br>
+            </div>
+            <div class="col-lg-6 order-lg-1 order-2">
+              <div class="d-flex justify-content-center align-items-start">
+                <img src="{% static 'img/nosotros.jpg' %}" alt="" class="img-fluid align-self-center">
+              </div>
+            </div>
+              
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+      <div class="container">
+          <div class="embed-responsive embed-responsive-16by9">
+              <iframe class="embed-responsive-item" src="https://www.youtube-nocookie.com/embed/DTrTC-OCvXY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          </div>
+      </div>
+      <br>
+      <br>
+      <br>
+
+    </section><!-- End Breadcrumbs Section -->
+
+    <section class="inner-page pt-4">
+      <div class="container">
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+    
+    <div class="footer-top">
+      <div class="container"></div>
+    </div>
+    <div class="container">
+
+      <div class="info d-flex flex-row justify-content-between">
+        <div class="mr-3">
+          <i class="bi bi-geo-alt"></i>
+          <p>Calle Maturana 501</p>
+        </div>
+    
+        <div class="mr-3">
+          <i class="bi bi-envelope"></i>
+          <p>Ferremas@ejemplo.com</p>
+        </div>
+    
+        <div>
+          <i class="bi bi-phone"></i>
+          <p>+1 5589 55488 55s</p>
+        </div>
+      </div>
+      <div class="social-links">
+        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+      <p class="text-center">© Copyright
+        <strong>Ferremas</strong>. Todos los derechos reservados.</p>
+    </div>
+      </footer><!-- End Footer -->
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    
+      <!-- Vendor JS Files -->
+      <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+      <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+      <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+      <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+      <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+      <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+      <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+      
+      <!-- Template Main JS File -->
+      <script src="{% static 'assets/js/main.js' %}"></script>
+    </body>
+    </html>

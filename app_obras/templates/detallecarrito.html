@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Detalle Boleta - Ferremas</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/ala.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i|Poppins:300,400,500,700" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+  
+  <!-- Template Main CSS File -->
+  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+
+</head>
+<script>
+  function showLogoutMessage(event) {
+      event.preventDefault();
+      var message = "¡Has cerrado la sesión exitosamente!";
+      alert(message);
+      window.location.href = event.currentTarget.href;
+  }
+</script>
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top d-flex align-items-center header-transparent header-scrolled">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div id="logo">
+        <h1><a href="/">Ferremas</a></h1>
+      </div>
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link scrollto" href="/#hero">Inicio</a></li>
+          <li><a class="nav-link scrollto" href="nosotros.html">Misión</a></li>
+          <li><a class="nav-link scrollto" href="galeria.html">Galería</a></li>
+          <li><a class="nav-link scrollto" href="/#contact">Ubicación</a></li> 
+          <li><a class="nav-link scrollto active" href="mostrar.html">Productos</a></li>    
+          {% if user.is_authenticated %}
+          <li><a class="nav-link scrollto" href="administracion.html">Administración</a></li>     
+          {% endif %}  
+          {% if user.is_authenticated %}
+          <li><a class="nav-link scrollto" href="/admin/logout/" onclick="showLogoutMessage(event)">Cerrar Sesión</a></li>
+          {% else %}
+          <li><a class="nav-link scrollto" href="/admin/">Login</a></li>
+          {% endif %}
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+    </div>
+  </header><!-- End Header -->
+  <section class="page-section bg-light breadcrumbs" id="portfolio">
+    <div class="container">
+        <h3> Detalle de Compra </h3><br><h6>Fecha: {{ fecha }}</h6>
+        <hr>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Código Boleta</th>
+                    <th>Código Producto</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prod in productos%}
+                <tr>
+                    <td>{{ prod.id_boleta }}</td>
+                    <td>{{ prod.id_producto }}</td>
+                    <td>{{ prod.cantidad }}</td>
+                    <td>{{ prod.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+               
+            <tr><td><h6>Total Compra: ${{ total }}</h6></td>
+            </tr>
+        </table>
+        <br><br><br><br><br><br><br><br><br><br><br>
+
+    </div>
+</section>
+
+</main><!-- End #main -->
+
+<!-- ======= Footer ======= -->
+<footer id="footer">
+  
+  <div class="footer-top">
+    <div class="container">
+
+    </div>
+  </div>
+
+
+
+  <div class="container">
+
+    
+    <div class="info d-flex flex-row justify-content-between">
+      <div class="mr-3">
+        <i class="bi bi-geo-alt"></i>
+        <p>Calle Maturana 501</p>
+      </div>
+    
+      <div class="mr-3">
+        <i class="bi bi-envelope"></i>
+        <p>Ferremas@ejemplo.com</p>
+      </div>
+    
+      <div>
+        <i class="bi bi-phone"></i>
+        <p>+1 5589 55488 55s</p>
+      </div>
+    </div>
+    <div class="copyright">
+      <div class="social-links">
+        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+      © Copyright <strong>Ferremas</strong>. Todos los derechos reservados.
+    </div>
+    </div>
+  </div>
+</footer><!-- End Footer -->
+
+<a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+<!-- Vendor JS Files -->
+<script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+<script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+<script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+<script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+<script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+
+<!-- Template Main JS File -->
+<script src="{% static 'assets/js/main.js' %}"></script>
+<script src="{% static 'assets/js/api.js' %}"></script>
+</body>
+</html>
