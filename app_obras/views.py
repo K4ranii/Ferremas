@@ -187,11 +187,9 @@ def limpiar_carrito(request):
 
 def generarBoleta(request):
     if request.method == 'GET':
-        # Verificar si el carrito está vacío
         if not request.session.get('carrito'):
             return render(request, 'webpay/plus/error.html', {'error': 'El carrito está vacío'})
         
-        # Generar Boleta
         precio_total = 0
         for key, value in request.session['carrito'].items():
             precio_total += int(value['precio']) * int(value['cantidad'])
@@ -207,8 +205,7 @@ def generarBoleta(request):
             detalle = detalle_boleta(id_boleta=boleta, id_producto=producto, cantidad=cant, subtotal=subtotal)
             detalle.save()
             productos.append(detalle)
-        
-        # Guardar detalles de la boleta en la sesión
+       
         request.session['boleta'] = boleta.id_boleta
         
         # Limpiar el carrito
