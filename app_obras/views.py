@@ -3,7 +3,6 @@ from .forms import ProductoForm, RegistroUserForm
 from django.contrib.auth import authenticate,login
 from django.contrib.auth.decorators import login_required
 from app_obras.compra import Carrito
-from django.shortcuts import render
 from django.http import HttpResponse
 import random
 from transbank.error.transbank_error import TransbankError
@@ -12,6 +11,7 @@ from rest_framework import generics
 from .models import Categoria, Producto, Boleta, detalle_boleta
 from .serializers import CategoriaSerializer, ProductoSerializer, BoletaSerializer, DetalleBoletaSerializer
 from django.http import HttpResponseBadRequest
+import requests
 
 
 def index(request):
@@ -46,10 +46,7 @@ def crear(request):
         productoform=ProductoForm()
     return render (request, 'crear.html', {'productoform': productoform})
 
-def mostrar(request):
-	productos= Producto.objects.all()
-	
-	return render(request, 'mostrar.html',context={'datos':productos})
+
 
 @login_required
 def eliminar(request, producto_id): 
@@ -78,31 +75,38 @@ def modificar(request, producto_id):
     return render(request, 'modificar.html', datos)
 
 
+def obtener_tasa_de_cambio():
+    try:
+        response = requests.get('https://api.exchangerate-api.com/v4/latest/CLP')
+        response.raise_for_status()
+        datos = response.json()
+        return datos['rates']['USD']
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener la tasa de cambio: {e}")
+        return None
+
 def mostrar(request):
-    productos = Producto.objects.all()
-    datos={
-        'productos':productos
+    try:
+        response = requests.get('http://127.0.0.1:8000/api/productos/')
+        response.raise_for_status()
+        productos = response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error al obtener productos de la API: {e}")
+        productos = []
+
+    tasa_de_cambio = obtener_tasa_de_cambio()
+    if tasa_de_cambio is not None:
+        for producto in productos:
+            producto['precio_usd'] = round(producto['precio'] * tasa_de_cambio, 2)
+    else:
+        for producto in productos:
+            producto['precio_usd'] = 'N/A'
+
+    datos = {
+        'productos': productos
     }
     return render(request, 'mostrar.html', datos)
 
-
-def webpay_plus_create(request):
-    if request.method == 'GET':
-        buy_order = str(random.randrange(1000000, 99999999))
-        session_id = str(random.randrange(1000000, 99999999))
-        amount = random.randrange(10000, 1000000)
-        return_url = request.build_absolute_uri('/webpay-plus/commit')
-
-        create_request = {
-            "buy_order": buy_order,
-            "session_id": session_id,
-            "amount": amount,
-            "return_url": return_url
-        }
-
-        response = Transaction().create(buy_order, session_id, amount, return_url)
-
-        return render(request, 'webpay/plus/create.html', {'request': create_request, 'response': response})
 
 def webpay_plus_commit(request):
     if request.method == 'GET':
@@ -114,8 +118,32 @@ def webpay_plus_commit(request):
 
         response = Transaction().commit(token=token)
         print("response: {}".format(response))
+        productos=[]
+        precio_total=0
+        if response['status'] == 'AUTHORIZED':
+            precio_total = 0
+            for key, value in request.session['carrito'].items():
+                precio_total += int(value['precio']) * int(value['cantidad'])
 
-        return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
+            boleta = Boleta(total=precio_total)
+            boleta.save()
+
+            productos = []
+            for key, value in request.session['carrito'].items():
+                producto = Producto.objects.get(idProducto=value['producto_id'])
+                cant = value['cantidad']
+                subtotal = cant * int(value['precio'])
+                detalle = detalle_boleta(id_boleta=boleta, id_producto=producto, cantidad=cant, subtotal=subtotal)
+                detalle.save()
+                productos.append(detalle)
+
+            request.session['boleta'] = boleta.id_boleta
+
+            carrito = Carrito(request)
+            carrito.limpiar()
+        context = {'token': token, 'response': response, 'productos': productos, 'total': precio_total}
+
+        return render(request, 'webpay/plus/commit.html', context)
     elif request.method == 'POST':
         token = request.POST.get("token_ws")
         print("commit error for token_ws: {}".format(token))
@@ -124,41 +152,6 @@ def webpay_plus_commit(request):
         }
 
         return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
-
-def webpay_plus_commit_error(request):
-    # Lógica para manejar errores en la transacción de pago
-    return HttpResponse("Error en la transacción de pago")
-
-def webpay_plus_refund(request):
-    if request.method == 'POST':
-        token = request.POST.get("token_ws")
-        amount = request.POST.get("amount")
-        print("refund for token_ws: {} by amount: {}".format(token, amount))
-
-        try:
-            response = Transaction().refund(token, amount)
-            print("response: {}".format(response))
-
-            return render(request, "webpay/plus/refund.html", {'token': token, 'amount': amount, 'response': response})
-        except TransbankError as e:
-            print(e.message)
-
-def webpay_plus_refund_form(request):
-    # Lógica para mostrar el formulario de reembolso
-    return render(request, 'webpay/plus/refund-form.html')
-
-def show_create(request):
-    # Lógica para mostrar el formulario de estado
-    return render(request, 'webpay/plus/status-form.html')
-
-def status(request):
-    token_ws = request.POST.get('token_ws')
-    tx = Transaction()
-    resp = tx.status(token_ws)
-    return render(request, 'webpay/plus/status.html', {'response': resp, 'token': token_ws, 'req': request.POST})
-
-# Create your views here.
-
 
 
 def agregar_producto(request,id):
@@ -193,53 +186,27 @@ def generarBoleta(request):
         precio_total = 0
         for key, value in request.session['carrito'].items():
             precio_total += int(value['precio']) * int(value['cantidad'])
-        
-        boleta = Boleta(total=precio_total)
-        boleta.save()
-        
-        productos = []
-        for key, value in request.session['carrito'].items():
-            producto = Producto.objects.get(idProducto=value['producto_id'])
-            cant = value['cantidad']
-            subtotal = cant * int(value['precio'])
-            detalle = detalle_boleta(id_boleta=boleta, id_producto=producto, cantidad=cant, subtotal=subtotal)
-            detalle.save()
-            productos.append(detalle)
-       
-        request.session['boleta'] = boleta.id_boleta
-        
-        # Limpiar el carrito
-        carrito = Carrito(request)
-        carrito.limpiar()
-
-        # Iniciar Transacción con Webpay Plus
         buy_order = str(random.randrange(1000000, 99999999))
         session_id = str(random.randrange(1000000, 99999999))
-        amount = boleta.total
         return_url = request.build_absolute_uri('/webpay-plus/commit')
 
         create_request = {
             "buy_order": buy_order,
             "session_id": session_id,
-            "amount": amount,
+            "amount": precio_total,
             "return_url": return_url
         }
 
         try:
-            response = Transaction().create(buy_order, session_id, amount, return_url)
+            response = Transaction().create(buy_order, session_id, precio_total, return_url)
             return render(request, 'webpay/plus/create.html', {'request': create_request, 'response': response})
         except Exception as e:
-            # Manejo de errores
             return render(request, 'webpay/plus/error.html', {'error': str(e)})
     else:
-        # Método HTTP no permitido
         return render(request, 'webpay/plus/error.html', {'error': 'Método HTTP no permitido'})
-    
 
 
-
-
-
+##API
 
 
 class CategoriaList(generics.ListCreateAPIView):
@@ -273,3 +240,55 @@ class DetalleBoletaList(generics.ListCreateAPIView):
 class DetalleBoletaDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = detalle_boleta.objects.all()
     serializer_class = DetalleBoletaSerializer
+
+
+##Default Webpay:
+
+def webpay_plus_commit_error(request):
+    return HttpResponse("Error en la transacción de pago")
+
+def webpay_plus_refund(request):
+    if request.method == 'POST':
+        token = request.POST.get("token_ws")
+        amount = request.POST.get("amount")
+        print("refund for token_ws: {} by amount: {}".format(token, amount))
+
+        try:
+            response = Transaction().refund(token, amount)
+            print("response: {}".format(response))
+
+            return render(request, "webpay/plus/refund.html", {'token': token, 'amount': amount, 'response': response})
+        except TransbankError as e:
+            print(e.message)
+
+def webpay_plus_refund_form(request):
+    # Lógica para mostrar el formulario de reembolso
+    return render(request, 'webpay/plus/refund-form.html')
+
+def show_create(request):
+    # Lógica para mostrar el formulario de estado
+    return render(request, 'webpay/plus/status-form.html')
+
+def status(request):
+    token_ws = request.POST.get('token_ws')
+    tx = Transaction()
+    resp = tx.status(token_ws)
+    return render(request, 'webpay/plus/status.html', {'response': resp, 'token': token_ws, 'req': request.POST})
+
+def webpay_plus_create(request):
+    if request.method == 'GET':
+        buy_order = str(random.randrange(1000000, 99999999))
+        session_id = str(random.randrange(1000000, 99999999))
+        amount = random.randrange(10000, 1000000)
+        return_url = request.build_absolute_uri('/webpay-plus/commit')
+
+        create_request = {
+            "buy_order": buy_order,
+            "session_id": session_id,
+            "amount": amount,
+            "return_url": return_url
+        }
+
+        response = Transaction().create(buy_order, session_id, amount, return_url)
+
+        return render(request, 'webpay/plus/create.html', {'request': create_request, 'response': response})

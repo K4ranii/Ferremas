@@ -1,4 +1,5 @@
 <html>
+    {% load humanize %}
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Ejemplo Webpay Plus - Confirmar Transacci&oacute;n</title>
@@ -21,7 +22,38 @@
     <h3>result</h3>
     {{ response }}
 </div>
-<b><p><samp>Pago ACEPTADO por webpay</samp></p></b>
+
+
+{% if response.status != 'FAILED' %}
+<b><p><samp style="color: rgb(0, 185, 0);">Pago Aceptado por webpay</samp></p></b>
+<h3> Detalle de Compra </h3><br><h6>Fecha: {{ fecha }}</h6>
+<hr>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Código Boleta</th>
+            <th>Código Producto</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for prod in productos%}
+        <tr>
+            <td>{{ prod.id_boleta }}</td>
+            <td>{{ prod.id_producto }}</td>
+            <td>{{ prod.cantidad }}</td>
+            <td>{{ prod.subtotal|intcomma }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+       
+    <tr><td><h6>Total Compra: ${{ total|intcomma }}</h6></td>
+    </tr>
+</table>
+{% else %}
+<b><p><samp style="color: rgb(255, 0, 0);">Pago Rechazado por webpay</samp></p></b>
+{% endif %}
 <br>
 <form action="/webpay-plus/refund" method="POST">
     <input type="hidden" name="token_ws" value="{{ token }}">

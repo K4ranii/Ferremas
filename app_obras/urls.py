@@ -11,12 +11,12 @@ urlpatterns = [
     path('eliminar/<producto_id>', eliminar, name="eliminar"),
     path('modificar/<producto_id>', modificar, name="modificar"),
 
-
+   path('eliminar_producto/<producto_id>', eliminar_producto, name="eliminar"),
     path('generarBoleta/', generarBoleta,name="generarBoleta"),
     path('agregar/<id>', agregar_producto, name="agregar"),
-    path('eliminar/<id>', eliminar_producto, name="eliminar"),
     path('restar/<id>', restar_producto, name="restar"),
     path('limpiar/', limpiar_carrito, name="limpiar"),
+
     path('webpay-plus/create', webpay_plus_create, name='webpay_plus_create'),
     path('webpay-plus/commit', webpay_plus_commit, name='webpay_plus_commit'),
     path('webpay-plus/commit-error', webpay_plus_commit_error, name='webpay_plus_commit_error'),
