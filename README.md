@@ -3,8 +3,7 @@ Repositorio para caso ferremas Integracion de Plataformas
 
 ## Requirements
 
-``` pip install -r requirements.txt
-```
+```pip install -r requirements.txt```
 
 ## DJANGO SUPER USER
 -----------------------------
