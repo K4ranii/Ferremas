@@ -126,7 +126,8 @@ def webpay_plus_commit(request):
                 precio_total += int(value['precio']) * int(value['cantidad'])
 
             boleta = Boleta(total=precio_total)
-            boleta.save()
+            if precio_total!=0:
+                boleta.save()
 
             productos = []
             for key, value in request.session['carrito'].items():
@@ -178,7 +179,7 @@ def limpiar_carrito(request):
     return redirect('mostrar')    
 
 
-def generarBoleta(request):
+def procesar_pago(request):
     if request.method == 'GET':
         if not request.session.get('carrito'):
             return render(request, 'webpay/plus/error.html', {'error': 'El carrito está vacío'})
