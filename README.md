@@ -1,6 +1,9 @@
 # Ferremas E-Commerce | Made in Django
-Repositorio para tienda de ferretería "Ferremas" con Integracion de Plataformas
-Carrito de compras con pasarela de pagos integrada a través del entorno de pruebas Webpay
+Repositorio para tienda de ferretería "Ferremas" con Integracion de Plataformas.
+
+Test carrito de compras con pasarela de pagos integrada a través del entorno de pruebas de Transbank Webpay (API/SDK)
+
+![Logo de Webpay](https://www.transbankdevelopers.cl/public/library/img/svg/logo_webpay.svg)
 
 ## Requirements
 
